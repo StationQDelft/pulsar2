@@ -105,20 +105,24 @@ class AWG5014Handler:
                 raise NotImplementedError("Nice try. Feature not yet available.")
 
             arr = wf['wf']
+            idx = str(i).zfill(4)
+            name_base = wf.get('name', f'{autoprefix}-{idx}')
+            reps = wf.get('nreps', 1)
+            wait = wf.get('trigger_wait', 1 if not i else 0)
+
             fields = [n for n in arr.dtype.fields]
 
             elt_names = []
             for c in range(1,5):
                 if f'ch{c}_wf' in fields:
                     package = self.pack_awg_wf(arr[f'ch{c}_wf'], arr[f'ch{c}_m1'], arr[f'ch{c}_m2'])
-                    idx = str(i).zfill(4)
-                    name = f'{autoprefix}-{idx}_ch{c}'
+                    name = name_base + f'_ch{c}'
                     packages[name] = package
                     elt_names.append(name)
 
             wfnames.append(elt_names)
-            nreps.append(1)
-            trig_wait.append(1 if not i else 0)
+            nreps.append(reps)
+            trig_wait.append(wait)
             goto.append(1 if i==nwfs-1 else 0)
             jump.append(0)
 
